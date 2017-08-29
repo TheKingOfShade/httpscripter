@@ -1,5 +1,5 @@
 """
-This script was built to generate random, user-defined, non-TLS encrypted traffic for analysis with wireshark. It generates GET requestes either with a single user agent string or with many different user agent strings, based on user input. It outputs the following:
+This script was built to generate random, user-defined, non-TLS encrypted traffic. It generates GET requestes either with a single user agent string or with many different user agent strings, based on user input. It outputs the following:
 1)A status code for the requested site (200:Ok, 404:Not Found)
 2)The User Agent String used to get that site
 3)The URL of the GET request
@@ -17,23 +17,25 @@ parser.add_argument("-U","--UASet",help="Sets a random User Agent String", actio
 parser.add_argument("-T","--time",type=int, help="Set the delay between requests in seconds", default=5)
 args=parser.parse_args()
 
-#Gets the user agent strings from an unfortunately poorly formatted list of user agent strings, scraped from http://useragentstring.com/pages/useragentstring.php?name=All
+#Gets the user agent strings froma list of user agent strings, scraped from http://useragentstring.com/pages/useragentstring.php?name=All
 lineslist = open('UAList').read().splitlines()
 
 #List of search engines that do not default to https
 traf = ['http://www.ask.com/web?q=','http://www.bing.com/search?q=','http://www.wikihow.com/wikiHowTo?search=','http://www.alibaba.com/trade/search?SearchText=','http://www.globo.com/busca/?q=']
 
 #Reads the input from the user and makes it useable for web browsers
-inp = str(input("What would you like to search for? "))
+inp = str(input("What would you like to search for?(Seperate queries by ;)"))
 fixedin = inp.replace(' ','+')
 
-#Fixes the poor formatting of the list
-#def cutprefix(str):
-#	return str[18:]
+#adds multiple query functionality
+queries = fixedin.split(";")
+
+def getRandom(li):
+	r = random.randint(0,len(li)-1)
+	return li[r]
 
 #Sets an initial UA string to use in case user wants to use the same one over and over
-Grandt = random.randint(0,len(lineslist))
-GrUAString = lineslist[Grandt]
+globalUAString = getRandom(lineslist)
 
 #Builds a packet based on UA and one of the Search engines defined in traf[]
 def buildapacket(UA,Searcher):
@@ -45,21 +47,24 @@ def buildapacket(UA,Searcher):
 
 #Creates packet with random UA String and Random Search engine
 def sendapacket():
-	randu=random.randint(0,len(traf)-1)
-	rSearcher = traf[randu]+fixedin
+	atTheEnd=getRandom(queries)	
+	rSearcher = getRandom(traf)+atTheEnd
 	if args.UASet==False:
-		randt = random.randint(0,len(lineslist))
-		rUAString = lineslist[randt]
-		buildapacket(rUAString,rSearcher)
+		localUAString = getRandom(lineslist)
+		buildapacket(localUAString,rSearcher)
 	else:
-		buildapacket(GrUAString,rSearcher)
+		buildapacket(globalUAString,rSearcher)
 
-#Timer to keep the process automated. Set at 5 Seconds.		
-ans=0
-strt = timeit.default_timer()
-while (ans > -1):
+#Timer to keep the process automated. Defaults at 5 Seconds.		
+
+def timedSender(time):
+	strt = timeit.default_timer()
 	now = timeit.default_timer()
 	ans = now-strt
-	if ans >args.time:
-		strt=timeit.default_timer()
-		sendapacket()
+	while ans < time:
+		now=timeit.default_timer()
+		ans = now-strt
+	else:
+		sendapacket()	
+		timedSender(time)
+timedSender(args.time)
