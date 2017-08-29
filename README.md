@@ -1,10 +1,10 @@
 # HttpScripter
 **HttpScripter** was built to generate a constant stream of HTTP traffic that is not TLS encrpyted. Its originial purpose was to aid in the instruction of wireshark analysis. 
 
-#### Disclaimer
+## Disclaimer
 This tool is only to be used for academic purposes and testing. It generates http traffic that is reasonably easy to sniff. The author bears no responsibility for any misuse of this tool.
 
-#### Usage
+## Usage
 ```
 python3 httpscripter.py -h
 ```
@@ -18,7 +18,7 @@ python3 httpscripter.py -h
 ```
 python3 httpscripter.py
 ```
-**__Default:__** This will give you the output
+__Default:__ This will give you the output
 ```
 What would you like to search for?(Seperate queries by ;)
 ```
@@ -33,5 +33,5 @@ python3 httpscripter.py -T 30
 ```
 This will decrease the frequency of sent GET requests to 30 seconds.
 
-#### Ending the process
+## Ending the process
 So far the only way to end the process is Ctrl+C
