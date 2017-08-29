@@ -13,7 +13,8 @@ import argparse
 
 #Create the argument parser
 parser = argparse.ArgumentParser()
-parser.add_argument("--UASet",help="Sets a random User Agent String", action="store_true")
+parser.add_argument("-U","--UASet",help="Sets a random User Agent String", action="store_true")
+parser.add_argument("-T","--time",type=int, help="Set the delay between requests in seconds", default=5)
 args=parser.parse_args()
 
 #Gets the user agent strings from an unfortunately poorly formatted list of user agent strings, scraped from http://useragentstring.com/pages/useragentstring.php?name=All
@@ -29,6 +30,7 @@ fixedin = inp.replace(' ','+')
 #Fixes the poor formatting of the list
 #def cutprefix(str):
 #	return str[18:]
+
 #Sets an initial UA string to use in case user wants to use the same one over and over
 Grandt = random.randint(0,len(lineslist))
 GrUAString = lineslist[Grandt]
@@ -58,6 +60,6 @@ strt = timeit.default_timer()
 while (ans > -1):
 	now = timeit.default_timer()
 	ans = now-strt
-	if ans >5:
+	if ans >args.time:
 		strt=timeit.default_timer()
 		sendapacket()
